@@ -40,17 +40,18 @@ from shutil import rmtree
 import pytz
 from bs4 import BeautifulSoup as bs
 from pyUltroid.functions.google_image import googleimagesdownload
-from pyUltroid.functions.misc import create_quotly
 from pyUltroid.functions.tools import metadata
 from telethon.tl.types import DocumentAttributeVideo
 
 from . import (
+    HNDLR,
     async_searcher,
     bash,
     downloader,
     eod,
     get_string,
     mediainfo,
+    quotly,
     ultroid_bot,
     ultroid_cmd,
     uploader,
@@ -141,10 +142,11 @@ async def adaudroid(e):
 
 
 @ultroid_cmd(
-    pattern=r"dob ?(.*)",
+    pattern=r"dob( (.*)|$)",
 )
 async def hbd(event):
-    if not event.pattern_match.group(1):
+    match = event.pattern_match.group(1).strip()
+    if not match:
         return await event.eor(get_string("spcltool_6"))
     if event.reply_to_msg_id:
         kk = await event.get_reply_message()
@@ -154,17 +156,14 @@ async def hbd(event):
         name = ultroid_bot.me.first_name
     zn = pytz.timezone("Asia/Kolkata")
     abhi = dt.now(zn)
-    n = event.text
-    q = n[5:]
-    kk = q.split("/")
+    kk = match.split("/")
     p = kk[0]
     r = kk[1]
     s = kk[2]
     day = int(p)
     month = r
-    paida = q
     try:
-        jn = dt.strptime(paida, "%d/%m/%Y")
+        jn = dt.strptime(match, "%d/%m/%Y")
     except BaseException:
         return await event.eor(get_string("spcltool_6"))
     jnm = zn.localize(jn)
@@ -235,7 +234,7 @@ async def hbd(event):
         f"""
     Name -: {name}
 
-D.O.B -:  {paida}
+D.O.B -:  {match}
 
 Lived -:  {saal}yr, {mahina}m, {din}d, {ghanta}hr, {mi}min, {slive}sec
 
@@ -256,9 +255,9 @@ Zodiac -: {sign}
     )
 
 
-@ultroid_cmd(pattern="sticker ?(.*)")
+@ultroid_cmd(pattern="sticker( (.*)|$)")
 async def _(event):
-    x = event.pattern_match.group(1)
+    x = event.pattern_match.group(1).strip()
     if not x:
         return await event.eor("`Give something to search`")
     uu = await event.eor(get_string("com_1"))
@@ -279,9 +278,9 @@ async def _(event):
     await uu.edit(a, parse_mode="html")
 
 
-@ultroid_cmd(pattern="wall ?(.*)")
+@ultroid_cmd(pattern="wall( (.*)|$)")
 async def wall(event):
-    inp = event.pattern_match.group(1)
+    inp = event.pattern_match.group(1).strip()
     if not inp:
         return await event.eor("`Give me something to search..`")
     nn = await event.eor(get_string("com_1"))
@@ -300,9 +299,9 @@ async def wall(event):
     await nn.delete()
 
 
-@ultroid_cmd(pattern="q ?(.*)", manager=True, allow_pm=True)
+@ultroid_cmd(pattern="q( (.*)|$)", manager=True, allow_pm=True)
 async def quott_(event):
-    match = event.pattern_match.group(1)
+    match = event.pattern_match.group(1).strip()
     if not event.is_reply:
         return await event.eor("`Reply to Message..`")
     msg = await event.eor(get_string("com_1"))
@@ -352,7 +351,9 @@ async def quott_(event):
     if match == "random":
         match = choice(all_col)
     try:
-        file = await create_quotly(reply_, bg=match, reply=replied_to, sender=user)
+        file = await quotly.create_quotly(
+            reply_, bg=match, reply=replied_to, sender=user
+        )
     except Exception as er:
         return await msg.edit(str(er))
     message = await reply.reply("Quotly by Ultroid", file=file)

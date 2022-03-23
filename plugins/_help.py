@@ -5,8 +5,12 @@
 # PLease read the GNU Affero General Public License in
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
-
+try:
+    from fuzzywuzzy.process import extractOne
+except ImportError:
+    extractOne = None
 from pyUltroid.dB._core import HELP, LIST
+from pyUltroid.functions.tools import cmd_regex_replace
 from telethon.errors.rpcerrorlist import (
     BotInlineDisabledError,
     BotMethodInvalidError,
@@ -35,9 +39,9 @@ _main_help_menu = [
 ]
 
 
-@ultroid_cmd(pattern="help ?(.*)")
+@ultroid_cmd(pattern="help( (.*)|$)")
 async def _help(ult):
-    plug = ult.pattern_match.group(1)
+    plug = ult.pattern_match.group(1).strip()
     chat = await ult.get_chat()
     if plug:
         try:
@@ -68,7 +72,36 @@ async def _help(ult):
                     x += "\n© @TeamUltroid"
                     await ult.eor(x)
                 except BaseException:
-                    await ult.eor(get_string("help_1").format(plug), time=5)
+                    file = None
+                    compare_strings = []
+                    for file_name in LIST:
+                        compare_strings.append(file_name)
+                        value = LIST[file_name]
+                        for j in value:
+                            j = cmd_regex_replace(j)
+                            compare_strings.append(j)
+                            if j.strip() == plug:
+                                file = file_name
+                                break
+                    if not file:
+                        # the enter command/plugin name is not found
+                        text = f"`{plug}` is not a valid plugin!"
+                        if extractOne:
+                            best_match = extractOne(plug, compare_strings)
+                            text += "\nDid you mean `{}`?".format(best_match[0])
+                        return await ult.eor(text)
+                    output = f"**Command** `{plug}` **found in plugin** - `{file}`\n"
+                    if file in HELP["Official"]:
+                        for i in HELP["Official"][file]:
+                            output += i
+                    elif HELP.get("Addons") and file in HELP["Addons"]:
+                        for i in HELP["Addons"][file]:
+                            output += i
+                    elif HELP.get("VCBot") and file in HELP["VCBot"]:
+                        for i in HELP["VCBot"][file]:
+                            output += i
+                    output += "\n© @TeamUltroid"
+                    await ult.eor(output)
         except BaseException as er:
             LOGS.exception(er)
             await ult.eor("Error 🤔 occured.")

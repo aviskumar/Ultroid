@@ -15,7 +15,11 @@ from os import execl, remove
 from random import choice
 
 from bs4 import BeautifulSoup as bs
-from pyUltroid.functions.gDrive import GDriveManager
+
+try:
+    from pyUltroid.functions.gDrive import GDriveManager
+except ImportError:
+    GDriveManager = None
 from pyUltroid.functions.helper import fast_download, progress, uploader
 from pyUltroid.functions.tools import (
     Carbon,
@@ -33,7 +37,7 @@ from . import *
 
 # --------------------------------------------------------------------#
 telegraph = telegraph_client()
-GDrive = GDriveManager()
+GDrive = GDriveManager() if GDriveManager else None
 # --------------------------------------------------------------------#
 
 
@@ -92,7 +96,7 @@ _buttons = {
             [Button.inline("« Bᴀᴄᴋ", data="cbs_pmcstm")],
         ],
     },
-    "alabs_vcstm": {
+    "alvcstm": {
         "text": f"Customise your {HNDLR}alive. Choose from the below options -",
         "buttons": [
             [Button.inline("Aʟɪᴠᴇ Tᴇxᴛ", data="abs_alvtx")],
@@ -1007,7 +1011,7 @@ async def apon(event):
 @callback("apof", owner=True)
 async def apof(event):
     try:
-        udB.del_key("AUTOAPPROVE")
+        udB.set_key("AUTOAPPROVE", "False")
         return await event.edit(
             "Done! AUTOAPPROVE Stopped!!",
             buttons=[[Button.inline("« Bᴀᴄᴋ", data="cbs_apauto")]],

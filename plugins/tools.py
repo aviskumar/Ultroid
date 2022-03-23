@@ -16,7 +16,7 @@
 • `{i}bots`
     Shows the number of bots in the current chat with their perma-link.
 
-• `{i}hl <a link>`
+• `{i}hl <a link> <text-optional>`
     Embeds the link with a whitespace as message.
 
 • `{i}id`
@@ -41,9 +41,19 @@ import io
 import os
 from asyncio.exceptions import TimeoutError as AsyncTimeout
 
-import cv2
-from google_trans_new import google_translator
-from htmlwebshot import WebShot
+try:
+    import cv2
+except ImportError:
+    cv2 = None
+
+try:
+    from google_trans_new import google_translator
+except ImportError:
+    google_translator = None
+try:
+    from htmlwebshot import WebShot
+except ImportError:
+    WebShot = None
 from pyUltroid.functions.tools import metadata
 from telethon.errors.rpcerrorlist import MessageTooLongError, YouBlockedUserError
 from telethon.tl.types import (
@@ -53,7 +63,7 @@ from telethon.tl.types import (
 )
 from telethon.utils import pack_bot_file_id
 
-from . import HNDLR, async_searcher, bash, eor, get_string
+from . import HNDLR, async_searcher, bash, con, eor, get_string
 from . import humanbytes as hb
 from . import inline_mention, is_url_ok, mediainfo, ultroid_cmd
 
@@ -88,11 +98,11 @@ async def _(event):
 
 
 @ultroid_cmd(
-    pattern="id ?(.*)",
+    pattern="id( (.*)|$)",
     manager=True,
 )
 async def _(event):
-    match = event.pattern_match.group(1)
+    match = event.pattern_match.group(1).strip()
     if event.reply_to_msg_id:
         await event.get_input_chat()
         r_msg = await event.get_reply_message()
@@ -131,10 +141,10 @@ async def _(event):
         )
 
 
-@ultroid_cmd(pattern="bots ?(.*)", groups_only=True, manager=True)
+@ultroid_cmd(pattern="bots( (.*)|$)", groups_only=True, manager=True)
 async def _(ult):
     mentions = "• **Bots in this Chat**: \n"
-    input_str = ult.pattern_match.group(1)
+    input_str = ult.pattern_match.group(1).strip()
     if not input_str:
         chat = ult.chat_id
     else:
@@ -158,14 +168,20 @@ async def _(ult):
 
 
 @ultroid_cmd(
-    pattern="hl",
+    pattern="hl( (.*)|$)",
 )
 async def _(ult):
-    try:
-        input = ult.text.split(" ", maxsplit=1)[1]
-    except IndexError:
+    input_ = ult.pattern_match.group(1).strip()
+    if not input_:
         return await ult.eor("`Input some link`", time=5)
-    await ult.eor("[ㅤㅤㅤㅤㅤㅤㅤ](" + input + ")", link_preview=False)
+    text = None
+    if len(input_.split()) > 1:
+        spli_ = input_.split()
+        input_ = spli_[0]
+        text = spli_[1]
+    if not text:
+        text = "ㅤㅤㅤㅤㅤㅤㅤ"
+    await ult.eor(f"[{text}](" + input_ + ")", link_preview=False)
 
 
 @ultroid_cmd(
@@ -186,14 +202,14 @@ async def _(e):
         output = cv2.resize(im, dsize, interpolation=cv2.INTER_AREA)
         cv2.imwrite("img.jpg", output)
         thumb = "img.jpg"
-        audio, _ = await e.client.fast_downloader(reply.document, reply.file.name)
+        audio, _ = await e.client.fast_downloader(reply.document)
         await msg.edit("`Creating video note...`")
         await bash(
             f'ffmpeg -i "{thumb}" -i "{audio.name}" -preset ultrafast -c:a libmp3lame -ab 64 circle.mp4 -y'
         )
         await msg.edit("`Uploading...`")
-        file, _ = await e.client.fast_uploader("circle.mp4", to_delete=True)
         data = await metadata("circle.mp4")
+        file, _ = await e.client.fast_uploader("circle.mp4", to_delete=True)
         await e.client.send_file(
             e.chat_id,
             file,
@@ -211,32 +227,38 @@ async def _(e):
         await msg.delete()
         [os.remove(k) for k in [audio.name, thumb]]
     elif mediainfo(reply.media) == "gif" or mediainfo(reply.media).startswith("video"):
-        msg = await e.eor("**Cʀᴇᴀᴛɪɴɢ Vɪᴅᴇᴏ Nᴏᴛᴇ**")
+        msg = await e.eor("**Creating video note**")
         file = await reply.download_media("resources/downloads/")
-        await e.client.send_file(
-            e.chat_id,
-            file,
-            video_note=True,
-            thumb="resources/extras/ultroid.jpg",
-            reply_to=reply,
-        )
+        if file.endswith(".webm"):
+            nfile = await con.ffmpeg_convert(file, "file.mp4")
+            os.remove(file)
+            file = nfile
+        if file:
+            await e.client.send_file(
+                e.chat_id,
+                file,
+                video_note=True,
+                thumb="resources/extras/ultroid.jpg",
+                reply_to=reply,
+            )
+            os.remove(file)
         await msg.delete()
-        os.remove(file)
+
     else:
         await e.eor("`Reply to a gif or audio file only.`")
 
 
 @ultroid_cmd(
-    pattern="ls ?(.*)",
+    pattern="ls( (.*)|$)",
 )
 async def _(e):
-    files = e.pattern_match.group(1)
+    files = e.pattern_match.group(1).strip()
     if not files:
         files = "*"
     elif files.endswith("/"):
-        files = files + "*"
+        files += "*"
     elif "*" not in files:
-        files = files + "/*"
+        files += "/*"
     files = glob.glob(files)
     if not files:
         return await e.eor("`Directory Empty or Incorrect.`", time=5)
@@ -350,10 +372,10 @@ async def _(e):
 
 
 @ultroid_cmd(
-    pattern="sg ?(.*)",
+    pattern="sg( (.*)|$)",
 )
 async def lastname(steal):
-    mat = steal.pattern_match.group(1)
+    mat = steal.pattern_match.group(1).strip()
     if not steal.is_reply and not mat:
         return await steal.eor("`Use this command with reply or give Username/id...`")
     if mat:
@@ -400,10 +422,10 @@ async def lastname(steal):
         await lol.edit("Error: @SangMataInfo_bot is not responding!.")
 
 
-@ultroid_cmd(pattern="webshot ?(.*)")
+@ultroid_cmd(pattern="webshot( (.*)|$)")
 async def webss(event):
     xx = await event.eor(get_string("com_1"))
-    xurl = event.pattern_match.group(1)
+    xurl = event.pattern_match.group(1).strip()
     if not xurl:
         return await xx.eor(get_string("wbs_1"), time=5)
     if not is_url_ok(xurl):
@@ -440,7 +462,7 @@ async def magic(event):
     )
     response = data.get("response", {})
     if not response.get("status"):
-        return await event.eor("**ERRROR :** `{}`".format(response["message"]))
+        return await event.eor("**ERROR :** `{}`".format(response["message"]))
     await event.eor(
         f"• **Ultroid Tiny**\n• Given Url : {url}\n• Shorten Url : {data['response']['tinyUrl']}"
     )

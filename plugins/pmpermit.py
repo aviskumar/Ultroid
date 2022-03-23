@@ -8,28 +8,28 @@
 ✘ Commands Available -
 
 • `{i}a` or `{i}approve`
-    To Approve Someone In PM.
+    Approve someone to PM.
 
 • `{i}da` or `{i}disapprove`
-    To Disapprove Someone In PM.
+    Disapprove someone to PM.
 
 • `{i}block`
-    To Block Someone in PM.
+    Block someone.
 
 • `{i}unblock` | `{i}unblock all`
-    To Unblock Someone in PM.
+    Unblock someone.
 
 • `{i}nologpm`
-    To stop logging from that user.
+    Stop logging messages from the user.
 
 • `{i}logpm`
-    Start logging again from that user.
+    Start logging messages from the user.
 
 • `{i}startarchive`
-    Will start adding new PMs to archive.
+    Archive new PMs.
 
 • `{i}stoparchive`
-    Will stop adding new PMs to archive.
+    Don't archive new PMs.
 
 • `{i}cleararchive`
     Unarchive all chats.
@@ -45,7 +45,11 @@ from os import remove
 from pyUltroid.dB import DEVLIST
 from pyUltroid.dB.logusers_db import *
 from pyUltroid.dB.pmpermit_db import *
-from tabulate import tabulate
+
+try:
+    from tabulate import tabulate
+except ImportError:
+    tabulate = None
 from telethon import events
 from telethon.errors import MessageNotModifiedError
 from telethon.tl.functions.contacts import (
@@ -353,7 +357,7 @@ if udB.get_key("PMSETTING"):
                 COUNT_PM[user.id] = COUNT_PM[user.id] + 1
             if COUNT_PM[user.id] >= WARNS:
                 await delete_pm_warn_msgs(user.id)
-                await event.respond(UNS)
+                _to_delete[user.id] = await event.respond(UNS)
                 try:
                     del COUNT_PM[user.id]
                     del LASTMSG[user.id]
@@ -375,7 +379,7 @@ if udB.get_key("PMSETTING"):
         pattern="(start|stop|clear)archive$",
     )
     async def _(e):
-        x = e.pattern_match.group(1)
+        x = e.pattern_match.group(1).strip()
         if x == "start":
             udB.set_key("MOVE_ARCHIVE", "True")
             await e.eor("Now I will move new Unapproved DM's to archive", time=5)
@@ -495,9 +499,9 @@ if udB.get_key("PMSETTING"):
             )
 
 
-@ultroid_cmd(pattern="block ?(.*)", fullsudo=True)
+@ultroid_cmd(pattern="block( (.*)|$)", fullsudo=True)
 async def blockpm(block):
-    match = block.pattern_match.group(1)
+    match = block.pattern_match.group(1).strip()
     if block.reply_to_msg_id:
         user = (await block.get_reply_message()).sender_id
     elif match:
@@ -516,7 +520,7 @@ async def blockpm(block):
         )
     await block.client(BlockRequest(user))
     aname = await block.client.get_entity(user)
-    await block.eor(f"`{aname.first_name} has been blocked!`")
+    await block.eor(f"{inline_mention(aname)} `has been blocked!`")
     try:
         disapprove_user(user)
     except AttributeError:
@@ -525,7 +529,7 @@ async def blockpm(block):
         await asst.edit_message(
             int(udB.get_key("LOG_CHANNEL")),
             _not_approved[user],
-            f"#BLOCKED\n\n[{aname.first_name}](tg://user?id={user}) [`{user}`] has been **blocked**.",
+            f"#BLOCKED\n\n{inline_mention(aname)} [`{user}`] has been **blocked**.",
             buttons=[
                 Button.inline("UnBlock", data=f"unblock_{user}"),
             ],
@@ -533,7 +537,7 @@ async def blockpm(block):
     except KeyError:
         _not_approved[user] = await asst.send_message(
             int(udB.get_key("LOG_CHANNEL")),
-            f"#BLOCKED\n\n[{aname.first_name}](tg://user?id={user}) [`{user}`] has been **blocked**.",
+            f"#BLOCKED\n\n{inline_mention(aname)} [`{user}`] has been **blocked**.",
             buttons=[
                 Button.inline("UnBlock", data=f"unblock_{user}"),
             ],
@@ -542,30 +546,40 @@ async def blockpm(block):
         pass
 
 
-@ultroid_cmd(pattern="unblock ?(.*)")
+@ultroid_cmd(pattern="unblock( (.*)|$)")
 async def unblockpm(event):
-    match = event.pattern_match.group(1) or (await event.get_reply_message()).sender_id
-    if not match:
-        return await event.eor(NO_REPLY + "`Or give it's username/id`", time=5)
-    if match == "all":
-        msg = await event.eor(get_string("com_1"))
-        u_s = await event.client(GetBlockedRequest(0, 0))
-        count = len(u_s.users)
-        if not count:
-            return await eor(msg, "__You have not blocked Anyone...__")
-        for user in u_s.users:
-            await asyncio.sleep(1)
-            await event.client(UnblockRequest(user.id))
-        # GetBlockedRequest return 20 users at most.
-        if count < 20:
-            return await eor(msg, f"__Unblocked {count} Users!__")
-        while u_s.users:
+    match = event.pattern_match.group(1).strip()
+    if event.reply_to_msg_id:
+        user = (await event.get_reply_message()).sender_id
+    elif match:
+        if match == "all":
+            msg = await event.eor(get_string("com_1"))
             u_s = await event.client(GetBlockedRequest(0, 0))
+            count = len(u_s.users)
+            if not count:
+                return await eor(msg, "__You have not blocked Anyone...__")
             for user in u_s.users:
-                await asyncio.sleep(3)
+                await asyncio.sleep(1)
                 await event.client(UnblockRequest(user.id))
-            count += len(u_s.users)
-        return await eor(msg, f"__Unblocked {count} users.__")
+            # GetBlockedRequest return 20 users at most.
+            if count < 20:
+                return await eor(msg, f"__Unblocked {count} Users!__")
+            while u_s.users:
+                u_s = await event.client(GetBlockedRequest(0, 0))
+                for user in u_s.users:
+                    await asyncio.sleep(3)
+                    await event.client(UnblockRequest(user.id))
+                count += len(u_s.users)
+            return await eor(msg, f"__Unblocked {count} users.__")
+
+        try:
+            user = await event.client.parse_id(match)
+        except Exception as er:
+            return await event.eor(str(er))
+    elif block.is_private:
+        user = (await event.get_chat()).id
+    else:
+        return await event.eor(NO_REPLY, time=10)
     try:
         user = await event.client.parse_id(match)
     except Exception as er:
@@ -573,7 +587,7 @@ async def unblockpm(event):
     try:
         await event.client(UnblockRequest(user))
         aname = await event.client.get_entity(user)
-        await event.eor(f"{inline_mention(aname)} [`user`] `has been UnBlocked!`")
+        await event.eor(f"{inline_mention(aname)} [`{user}`] `has been UnBlocked!`")
     except Exception as et:
         return await event.eor(f"ERROR - {et}")
     try:
@@ -611,9 +625,15 @@ async def list_approved(event):
             name = ""
         users.append([name.strip(), str(i)])
     with open("approved_pms.txt", "w") as list_appr:
-        list_appr.write(
-            tabulate(users, headers=["UserName", "UserID"], showindex="always")
-        )
+        if tabulate:
+            list_appr.write(
+                tabulate(users, headers=["UserName", "UserID"], showindex="always")
+            )
+        else:
+            text = ""
+            for user in users:
+                text += f"[{user[-1]}] - {user[0]}"
+            list_appr.write(text)
     await event.reply(
         "List of users approved by [{}](tg://user?id={})".format(OWNER_NAME, OWNER_ID),
         file="approved_pms.txt",
@@ -762,7 +782,7 @@ async def ytfuxist(e):
 
 @in_pattern(re.compile("ip_(.*)"), owner=True)
 async def in_pm_ans(event):
-    from_user = int(event.pattern_match.group(1))
+    from_user = int(event.pattern_match.group(1).strip())
     try:
         warns = U_WARNS[from_user]
     except Exception as e:
@@ -831,7 +851,7 @@ async def in_pm_ans(event):
 
 @callback(re.compile("admin_only(.*)"), from_users=[ultroid_bot.uid])
 async def _admin_tools(event):
-    chat = int(event.pattern_match.group(1))
+    chat = int(event.pattern_match.group(1).strip())
     await event.edit(
         buttons=[
             [
@@ -845,7 +865,7 @@ async def _admin_tools(event):
 
 @callback(re.compile("don_(.*)"))
 async def _mejik(e):
-    data = e.pattern_match.group(1).decode("utf-8").split("/")
+    data = e.pattern_match.group(1).strip().decode("utf-8").split("/")
     text = "👮‍♂ Warn Count : " + data[0]
     text += "\n🤖 Total Warn Count : " + data[1]
     await e.answer(text, alert=True)
@@ -853,7 +873,7 @@ async def _mejik(e):
 
 @callback(re.compile("pmbk_(.*)"))
 async def edt(event):
-    from_user = int(event.pattern_match.group(1))
+    from_user = int(event.pattern_match.group(1).strip())
     try:
         warns = U_WARNS[from_user]
     except Exception as e:

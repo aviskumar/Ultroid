@@ -21,9 +21,9 @@
 """
 import os
 
+from pyUltroid._misc import sudoers
 from pyUltroid.dB.snips_db import add_snip, get_snips, list_snip, rem_snip
 from pyUltroid.functions.tools import create_tl_btn, format_btn, get_msg_button
-from pyUltroid.misc import sudoers
 from telegraph import upload_file as uf
 from telethon.utils import pack_bot_file_id
 
@@ -31,9 +31,9 @@ from . import events, get_string, mediainfo, udB, ultroid_bot, ultroid_cmd
 from ._inline import something
 
 
-@ultroid_cmd(pattern="addsnip ?(.*)")
+@ultroid_cmd(pattern="addsnip( (.*)|$)")
 async def an(e):
-    wrd = (e.pattern_match.group(1)).lower()
+    wrd = (e.pattern_match.group(1).strip()).lower()
     wt = await e.get_reply_message()
     if not (wt and wrd):
         return await e.eor(get_string("snip_1"))
@@ -72,9 +72,9 @@ async def an(e):
     ultroid_bot.add_handler(add_snips, events.NewMessage())
 
 
-@ultroid_cmd(pattern="remsnip ?(.*)")
+@ultroid_cmd(pattern="remsnip( (.*)|$)")
 async def rs(e):
-    wrd = (e.pattern_match.group(1)).lower()
+    wrd = (e.pattern_match.group(1).strip()).lower()
     if not wrd:
         return await e.eor(get_string("snip_2"))
     if wrd.startswith("$"):

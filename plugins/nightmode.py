@@ -29,17 +29,24 @@ And Turn On auto at morning
    Ex- `nmtime 01 00 06 30`
 """
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from . import LOGS
+
+try:
+    from apscheduler.schedulers.asyncio import AsyncIOScheduler
+except ImportError:
+    LOGS.error("nightmode: 'apscheduler' not Installed!")
+    AsyncIOScheduler = None
+
 from pyUltroid.dB.night_db import *
 from telethon.tl.functions.messages import EditChatDefaultBannedRightsRequest
 from telethon.tl.types import ChatBannedRights
 
-from . import LOGS, get_string, ultroid_bot, ultroid_cmd
+from . import get_string, udB, ultroid_bot, ultroid_cmd
 
 
-@ultroid_cmd(pattern="nmtime ?(.*)")
+@ultroid_cmd(pattern="nmtime( (.*)|$)")
 async def set_time(e):
-    if not e.pattern_match.group(1):
+    if not e.pattern_match.group(1).strip():
         return await e.eor(get_string("nightm_1"))
     try:
         ok = e.text.split(maxsplit=1)[1].split()
@@ -52,9 +59,9 @@ async def set_time(e):
         await e.eor(get_string("nightm_1"))
 
 
-@ultroid_cmd(pattern="addnm ?(.*)")
+@ultroid_cmd(pattern="addnm( (.*)|$)")
 async def add_grp(e):
-    pat = e.pattern_match.group(1)
+    pat = e.pattern_match.group(1).strip()
     if pat:
         try:
             add_night((await ultroid_bot.get_entity(pat)).id)
@@ -65,9 +72,9 @@ async def add_grp(e):
     await e.eor(get_string("nightm_3"))
 
 
-@ultroid_cmd(pattern="remnm ?(.*)")
+@ultroid_cmd(pattern="remnm( (.*)|$)")
 async def rem_grp(e):
-    pat = e.pattern_match.group(1)
+    pat = e.pattern_match.group(1).strip()
     if pat:
         try:
             rem_night((await ultroid_bot.get_entity(pat)).id)
@@ -138,7 +145,7 @@ async def close_grp():
             LOGS.info(er)
 
 
-if night_grps():
+if AsyncIOScheduler and night_grps():
     try:
         h1, m1, h2, m2 = 0, 0, 7, 0
         if udB.get_key("NIGHT_TIME"):

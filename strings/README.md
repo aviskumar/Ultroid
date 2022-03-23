@@ -4,31 +4,28 @@
 | Code | Language | Translated | Remaining |
 |----|-------|-------|---|
 | en | English [English] | 413 | 0 |
-| ru | Russian [Русский] | 413 | 0 |
-| id | Indonesia [Indonesia] | 389 | 24 |
-| ar | Arabic [العربية] | 170 | 243 |
-| gu | Gujarati [ગુજરાતી] | 111 | 302 |
+| ka | Kannada [ಕನ್ನಡ] | 112 | 301 |
+| bn | Bengali [বাংলা] | 382 | 31 |
+| od | Odia [ଓଡିଆ] | 112 | 301 |
+| ru | Russian [Русский] | 411 | 2 |
+| pt-br | Portuguese [Português] | 413 | NULL |
+| my | Malay [Bahasa Melayu] | 112 | 301 |
+| jp | Japanese [日本] | 413 | NULL |
+| tr | Turkish [Türk] | 112 | 301 |
+| si | sinhala [සිංහල] | 112 | 301 |
+| fa | Persian [Farsi] | 391 | 22 |
+| hi | Hindi [हिंदी] | 413 | NULL |
 | az | Azerbaijan [Azərbaycan] | 382 | 31 |
-| mr | Marathi [मराठी] | 114 | 299 |
-| hi | Hindi [हिंदी] | 410 | 3 |
-| fa | Persian [Farsi] | 413 | `NEED_TRANSLATION` |
-| my | Malay [Bahasa Melayu] | 114 | 299 |
-| ml | Malayalam [മലയാളം] | 114 | 299 |
-| si | sinhala [සිංහල] | 114 | 299 |
-| jp | Japanese [日本] | 396 | 17 |
-| es | Spanish [Español] | 114 | 299 |
-| bn | bengoli [বাংলা] | 114 | 299 |
-| pt-br | Portuguese [Português] | 114 | 299 |
-| tr | Turkish [Türk] | 114 | 299 |
-| it | Italian [italiano] | 113 | 300 |
-| ta | தமிழ் [தமிழ்] | 114 | 299 |
-| od | Odia [ଓଡିଆ] | 114 | 299 |
-| ka | Kannada [ಕನ್ನಡ] | 114 | 299 |
-| cn | Chinese [简体中文] | 114 | 299 |
+| id | Indonesia [Indonesia] | 413 | NULL |
+| cn | Chinese [简体中文] | 112 | 301 |
+| ta | தமிழ் [தமிழ்] | 112 | 301 |
+| mr | Marathi [मराठी] | 131 | 282 |
+| ar | Arabic [العربية] | 411 | 2 |
+| it | Italian [italiano] | 111 | 302 |
+| gu | Gujarati [ગુજરાતી] | 109 | 304 |
+| ml | Malayalam [മലയാളം] | 112 | 301 |
+| es | Spanish [Español] | 409 | 4 |
 
-### Note
-- `NEED_TRANSLATION` says, "Translation is half remaining and in that place English Strings are placed, so Translation helper need to check file instead."
 
-- If Strings are not present, Google Translation will be used to Translate them at time of Usage.
-<br><br>
-• Remaining Strings can be found [here](./remaining.csv) for easy sort out.
+If Strings are not present, Google Translation will be used to Translate them at time of Usage.
+<br>• Remaining Strings can be found [here](./remaining.csv) for easy sort out.

@@ -20,10 +20,17 @@ import uuid
 from html import unescape
 from random import choice, shuffle
 
-import akinator
+from . import LOGS
+
+try:
+    import akinator
+except ImportError:
+    akinator = None
+    LOGS.error("'akinator' not installed.")
+
+from pyUltroid._misc._decorators import ultroid_cmd
 from pyUltroid.functions.helper import inline_mention
 from pyUltroid.functions.tools import async_searcher
-from pyUltroid.misc._decorators import ultroid_cmd
 from telethon.errors.rpcerrorlist import (
     BotMethodInvalidError,
     ChatSendStickersForbiddenError,
@@ -41,6 +48,8 @@ aki_photo = "https://telegra.ph/file/3cc8825c029fd0cab9edc.jpg"
 
 @ultroid_cmd(pattern="akinator")
 async def akina(e):
+    if not akinator:
+        return
     sta = akinator.Akinator()
     games.update({e.chat_id: {e.id: sta}})
     try:
@@ -65,7 +74,7 @@ async def _akokk(e):
 
 @callback(re.compile("aki_(.*)"), owner=True)
 async def doai(e):
-    adt = e.pattern_match.group(1).decode("utf-8")
+    adt = e.pattern_match.group(1).strip().decode("utf-8")
     dt = adt.split("_")
     ch = int(dt[0])
     mid = int(dt[1])
@@ -156,10 +165,11 @@ CONGO_STICKER = [
     "CAADAgADjAADECECEFZM-SrKO9GgAg",
     "CAADAgADSwIAAj-VzArAzNCDiGWAHAI",
     "CAADAgADhQADwZxgDIuMHR9IU10iAg",
+    "CAADAgADiwMAAsSraAuoe2BwYu1sdQI",
 ]
 
 
-@callback("delit")
+@callback("delit", owner=True)
 async def delete_it(event):
     await event.delete()
 

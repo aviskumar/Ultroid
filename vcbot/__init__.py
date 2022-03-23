@@ -30,6 +30,7 @@ from telethon.errors.rpcerrorlist import (
     ChatSendMediaForbiddenError,
 )
 from pyUltroid import HNDLR, LOGS, asst, udB, vcClient
+from pyUltroid._misc._decorators import compile_pattern
 from pyUltroid.functions.helper import (
     bash,
     downloader,
@@ -40,21 +41,24 @@ from pyUltroid.functions.helper import (
 from pyUltroid.functions.admins import admin_check
 from pyUltroid.functions.tools import is_url_ok
 from pyUltroid.functions.ytdl import get_videos_link
-from pyUltroid.misc import owner_and_sudos, sudoers
-from pyUltroid.misc._assistant import in_pattern
-from pyUltroid.misc._wrappers import eod, eor
+from pyUltroid._misc import owner_and_sudos, sudoers
+from pyUltroid._misc._assistant import in_pattern
+from pyUltroid._misc._wrappers import eod, eor
 from pyUltroid.version import __version__ as UltVer
 from telethon import events
 from telethon.tl import functions, types
 from telethon.utils import get_display_name
 
 try:
-    from youtube_dl import YoutubeDL
+    from yt_dlp import YoutubeDL
 except ImportError:
     YoutubeDL = None
-    LOGS.info("'YoutubeDL' not found!")
+    LOGS.error("'yt-dlp' not found!")
 
-from youtubesearchpython import Playlist, ResultMode, Video, VideosSearch
+try:
+   from youtubesearchpython import VideosSearch
+except ImportError:
+    VideosSearch = None
 
 from strings import get_string
 
@@ -80,7 +84,6 @@ class Player:
         else:
             _client = GroupCallFactory(
                 vcClient, GroupCallFactory.MTPROTO_CLIENT_TYPE.TELETHON,
-                path_to_log_file="VCBot.log"
             )
             self.group_call = _client.get_group_call()
             CLIENTS.update({chat: self.group_call})
@@ -220,7 +223,7 @@ def vc_asst(dec, **kwargs):
             lambda e: not e.is_private and not e.via_bot_id and not e.fwd_from
         )
         handler = udB.get_key("VC_HNDLR") or HNDLR
-        kwargs["pattern"] = re.compile(f"\\{handler}" + dec)
+        kwargs["pattern"] = compile_pattern(dec, handler)
         vc_auth = kwargs.get("vc_auth", True)
         key = udB.get_key("VC_AUTH_GROUPS") or {}
         if "vc_auth" in kwargs:
@@ -311,13 +314,17 @@ async def get_from_queue(chat_id):
 
 
 async def download(query):
-    search = VideosSearch(query, limit=1).result()
-    data = search["result"][0]
-    link = data["link"]
+    if query.startswith("https://") and not "youtube" in query.lower():
+        thumb, duration = None, "Unknown"
+        title = link = query
+    else:
+        search = VideosSearch(query, limit=1).result()
+        data = search["result"][0]
+        link = data["link"]
+        title = data["title"]
+        duration = data.get("duration") or "♾"
+        thumb = f"https://i.ytimg.com/vi/{data['id']}/hqdefault.jpg"
     dl = await get_stream_link(link)
-    title = data["title"]
-    duration = data.get("duration") or "♾"
-    thumb = f"https://i.ytimg.com/vi/{data['id']}/hqdefault.jpg"
     return dl, thumb, title, link, duration
 
 
@@ -332,7 +339,7 @@ async def get_stream_link(ytlink):
                 k = x["url"]
     return k
     """
-    stream = await bash(f'youtube-dl -g -f "best[height<=?720][width<=?1280]" {ytlink}')
+    stream = await bash(f'yt-dlp -g -f "best[height<=?720][width<=?1280]" {ytlink}')
     return stream[0]
 
 

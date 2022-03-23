@@ -24,9 +24,9 @@ from telethon.tl.functions.photos import UploadProfilePhotoRequest
 from . import LOGS, get_string, udB, ultroid_bot, ultroid_cmd
 
 
-@ultroid_cmd(pattern="autopic ?(.*)")
+@ultroid_cmd(pattern="autopic( (.*)|$)")
 async def autopic(e):
-    search = e.pattern_match.group(1)
+    search = e.pattern_match.group(1).strip()
     if udB.get_key("AUTOPIC") and not search:
         udB.del_key("AUTOPIC")
         return await e.eor(get_string("autopic_5"))
@@ -58,7 +58,7 @@ async def autopic(e):
             file = await e.client.upload_file(lie)
             await e.client(UploadProfilePhotoRequest(file))
             await asyncio.sleep(SLEEP_TIME)
-        shuffle(clls)
+        shuffle(ok)
 
 
 if search := udB.get_key("AUTOPIC"):
@@ -92,8 +92,11 @@ if search := udB.get_key("AUTOPIC"):
         await ultroid_bot(UploadProfilePhotoRequest(file))
         shuffle(ok)
 
-    from apscheduler.schedulers.asyncio import AsyncIOScheduler
+    try:
+        from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-    schedule = AsyncIOScheduler()
-    schedule.add_job(autopic_func, "interval", seconds=sleep)
-    schedule.start()
+        schedule = AsyncIOScheduler()
+        schedule.add_job(autopic_func, "interval", seconds=sleep)
+        schedule.start()
+    except ModuleNotFoundError as er:
+        LOGS.error(f"autopic: '{er.name}' not installed.")
