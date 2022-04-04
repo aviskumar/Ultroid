@@ -1,4 +1,3 @@
-import sys
 from os import listdir, path
 from typing import Any, Dict, List, Union
 
