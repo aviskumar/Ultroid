@@ -210,9 +210,8 @@ async def chatBot_replies(e):
     if e.is_group and not sender.bot:
         if sender.username:
             await uname_stuff(e.sender_id, sender.username, sender.first_name)
-    elif e.is_private and not sender.bot:
-        if chat.username:
-            await uname_stuff(e.sender_id, chat.username, chat.first_name)
+    elif e.is_private and not sender.bot and chat.username:
+        await uname_stuff(e.sender_id, chat.username, chat.first_name)
     if detector and is_profan(e.chat_id) and e.text:
         x, y = detector(e.text)
         if y:
