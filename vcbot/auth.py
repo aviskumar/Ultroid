@@ -154,7 +154,7 @@ async def _(e):
     try:
         add_vcsudo(userid)
         await xx.eor(
-            
+
             f"[{name}](tg://user?id={userid})` is added to Voice Chat Bot Users.`",
             time=5,
         )
