@@ -58,7 +58,6 @@ from telethon.utils import resolve_bot_file_id
 from . import (
     ATRA_COL,
     INLINE_PIC,
-    LOGS,
     OWNER_NAME,
     ULTROID_IMAGES,
     Button,
