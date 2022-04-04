@@ -403,7 +403,7 @@ async def piston_run(event):
     if not PISTON_LANGS:
         se = await async_searcher(PISTON_URI + "runtimes", re_json=True)
         PISTON_LANGS.update({lang.pop("language"): lang for lang in se})
-    if lang in PISTON_LANGS.keys():
+    if lang in PISTON_LANGS:
         version = PISTON_LANGS[lang]["version"]
     else:
         result = await event.builder.article(

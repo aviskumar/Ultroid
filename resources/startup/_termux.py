@@ -144,7 +144,7 @@ def ask_and_wait_opt():
         print("Exiting...")
         exit(0)
     elif strm == "a":
-        for opt in OPT_PACKAGES.keys():
+        for opt in OPT_PACKAGES:
             print(f"* {Fore.YELLOW}Do you want to install '{opt}'? [Y/N]\n- {OPT_PACKAGES[opt]}")
             if yes_no_apt():
                 print(f"Installing {opt}...")
