@@ -7,6 +7,7 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 from os import system, path
+import sys
 from time import sleep
 from datetime import datetime
 from colorama import Style, Fore, Back
@@ -106,7 +107,7 @@ def ask_process_info_text():
     strm = input("").lower().strip()
     if strm == "e":
         print("Exiting...")
-        exit(0)
+        sys.exit(0)
     elif strm == "a":
         pass
     else:
@@ -119,7 +120,7 @@ def ask_process_apt_install():
     strm = input("").lower().strip()
     if strm == "e":
         print("Exiting...")
-        exit(0)
+        sys.exit(0)
     elif strm == "a":
         for apt in APT_PACKAGES:
             print(f"* Do you want to install '{apt}'? [Y/N] ")
@@ -142,7 +143,7 @@ def ask_and_wait_opt():
     strm = input("").strip().lower()
     if strm == "e":
         print("Exiting...")
-        exit(0)
+        sys.exit(0)
     elif strm == "a":
         for opt in OPT_PACKAGES.keys():
             print(f"* {Fore.YELLOW}Do you want to install '{opt}'? [Y/N]\n- {OPT_PACKAGES[opt]}")

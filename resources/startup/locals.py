@@ -9,6 +9,7 @@
 # Standalone file for facilitating local deploys.
 
 import os
+import sys
 
 a = r"""
   _    _ _ _             _     _
@@ -46,7 +47,7 @@ def start():
         print(
             'Please choose "generate" to generate a session string, or "skip" to pass on.\n\nPlease run the script again!',
         )
-        exit(0)
+        sys.exit(0)
 
     # start bleck megik
     print("\n\nLets start entering the variables.\n\n")
@@ -110,12 +111,12 @@ def check_for_py():
         )
     except BaseException:
         print("Please run the script again, and enter the choice as a number!!")
-        exit(0)
+        sys.exit(0)
     if ch == 1:
         pass
     elif ch == 2:
         print("Please install python and continue!")
-        exit(0)
+        sys.exit(0)
     else:
         print("Weren't you taught how to read? Enter a choice!!")
         return
