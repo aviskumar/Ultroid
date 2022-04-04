@@ -388,9 +388,9 @@ async def _(e):
     chats = 0
     if userid == ultroid_bot.uid:
         return await xx.eor("`I can't gban myself.`", time=3)
-    elif userid in DEVLIST:
+    if userid in DEVLIST:
         return await xx.eor("`I can't gban my Developers.`", time=3)
-    elif is_gbanned(userid):
+    if is_gbanned(userid):
         return await eod(
             xx,
             "`User is already gbanned and added to gbanwatch.`",

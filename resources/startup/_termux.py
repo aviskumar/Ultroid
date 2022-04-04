@@ -96,7 +96,7 @@ def yes_no_apt():
     yes_no = input("").strip().lower()
     if yes_no in ["yes", "y"]:
         return True
-    elif yes_no in ["no", "n"]:
+    if yes_no in ["no", "n"]:
         return False
     print("Invalid Input\nRe-Enter: ")
     return yes_no_apt()

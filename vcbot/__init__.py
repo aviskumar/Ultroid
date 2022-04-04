@@ -237,7 +237,7 @@ def vc_asst(dec, **kwargs):
                 or (vc_auth and e.chat_id in VCAUTH)
             ):
                 return
-            elif vc_auth and key.get(e.chat_id):
+            if vc_auth and key.get(e.chat_id):
                 cha, adm = key.get(e.chat_id), key[e.chat_id]["admins"]
                 if adm and not (await admin_check(e)):
                     return
