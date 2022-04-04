@@ -99,8 +99,7 @@ async def volume_setter(event):
     if vol:
         ultSongs = Player(chat)
         await ultSongs.group_call.set_my_volume(int(vol))
-        if vol > 200:
-            vol = 200
+        vol = min(vol, 200)
         vol = max(vol, 1)
         return await event.eor(get_string("vcbot_3").format(vol))
 
