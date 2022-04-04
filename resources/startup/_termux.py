@@ -100,7 +100,7 @@ def yes_no_apt():
         return False
     print("Invalid Input\nRe-Enter: ")
     return yes_no_apt()
-                
+
 
 def ask_process_info_text():
     strm = input("").lower().strip()
@@ -173,7 +173,7 @@ def ask_make_env():
 
     else:
         print("OK!")
-    
+
 # ------------------------------------------------------------------------------------------ #
 
 clear()
