@@ -62,7 +62,7 @@ async def video_c(event):
                 "https://telegra.ph/file/22bb2349da20c7524e4db.mp4",
                 song,
                 song,
-                "♾",
+                "♾"
             )
     ultSongs = Player(chat, xx, True)
     if not await ultSongs.vc_joiner():
