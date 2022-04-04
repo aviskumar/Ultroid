@@ -89,11 +89,10 @@ async def chat_bot_fn(event, type_):
                 key[chat].append(user)
         else:
             key.update({chat: [user]})
-    elif type_ == "remov":
-        if key.get(chat):
-            if user in key[chat]:
-                key[chat].remove(user)
-            if chat in key and not key[chat]:
-                del key[chat]
+    elif type_ == "remov" and key.get(chat):
+        if user in key[chat]:
+            key[chat].remove(user)
+        if chat in key and not key[chat]:
+            del key[chat]
     udB.set_key("CHATBOT_USERS", str(key))
     await event.eor(f"**ChatBot:**\n{type_}ed {inline_mention(user_)}")
