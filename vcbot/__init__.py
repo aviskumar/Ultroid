@@ -229,7 +229,7 @@ def vc_asst(dec, **kwargs):
                 return
             if vc_auth and key.get(e.chat_id):
                 cha, adm = key.get(e.chat_id), key[e.chat_id]["admins"]
-                if adm and not (await admin_check(e)):
+                if adm and not await admin_check(e):
                     return
             try:
                 await func(e)

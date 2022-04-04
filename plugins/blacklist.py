@@ -34,7 +34,7 @@ from . import events, get_string, udB, ultroid_bot, ultroid_cmd
 async def af(e):
     wrd = e.pattern_match.group(1).strip()
     chat = e.chat_id
-    if not (wrd):
+    if not wrd:
         return await e.eor(get_string("blk_1"), time=5)
     wrd = e.text[11:]
     heh = wrd.split(" ")
