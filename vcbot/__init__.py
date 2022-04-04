@@ -27,6 +27,8 @@ from telethon.errors.rpcerrorlist import (
     ParticipantJoinMissingError,
     ChatSendMediaForbiddenError,
 )
+from telethon import events
+from telethon.tl import functions
 from pyUltroid import HNDLR, LOGS, asst, udB, vcClient
 from pyUltroid._misc._decorators import compile_pattern
 from pyUltroid.functions.helper import (
@@ -38,8 +40,6 @@ from pyUltroid.functions.admins import admin_check
 from pyUltroid.functions.ytdl import get_videos_link
 from pyUltroid._misc import owner_and_sudos
 from pyUltroid.version import __version__ as UltVer
-from telethon import events
-from telethon.tl import functions
 
 try:
     from yt_dlp import YoutubeDL

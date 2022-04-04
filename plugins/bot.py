@@ -44,6 +44,7 @@ from telethon.errors.rpcerrorlist import (
     BotMethodInvalidError,
     ChatSendMediaForbiddenError,
 )
+from telethon.utils import resolve_bot_file_id
 
 from . import HOSTED_ON, LOGS
 
@@ -52,8 +53,6 @@ try:
 except ImportError:
     LOGS.error("bot: 'gitpython' module not found!")
     Repo = None
-
-from telethon.utils import resolve_bot_file_id
 
 from . import (
     ATRA_COL,
