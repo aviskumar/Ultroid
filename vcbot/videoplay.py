@@ -64,7 +64,7 @@ async def video_c(event):
                 "♾",
             )
     ultSongs = Player(chat, xx, True)
-    if not (await ultSongs.vc_joiner()):
+    if not await ultSongs.vc_joiner():
         return
     text = "🎸 **Now playing:** [{}]({})\n⏰ **Duration:** `{}`\n👥 **Chat:** `{}`\n🙋‍♂ **Requested by:** {}".format(
         title, link, duration, chat, from_user
