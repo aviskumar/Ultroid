@@ -18,7 +18,7 @@ from . import bash, get_string, mediainfo, ultroid_cmd
 @ultroid_cmd(pattern="glitch$")
 async def _(e):
     try:
-        import glitch_me  # ignore :pylint
+        pass
     except ModuleNotFoundError:
         await bash(
             "pip install -e git+https://github.com/1Danish-00/glitch_me.git#egg=glitch_me"

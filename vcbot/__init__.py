@@ -18,8 +18,6 @@
 
 import asyncio
 import os
-import re
-import traceback
 from time import time
 from traceback import format_exc
 
@@ -34,20 +32,14 @@ from pyUltroid._misc._decorators import compile_pattern
 from pyUltroid.functions.helper import (
     bash,
     downloader,
-    inline_mention,
-    mediainfo,
     time_formatter,
 )
 from pyUltroid.functions.admins import admin_check
-from pyUltroid.functions.tools import is_url_ok
 from pyUltroid.functions.ytdl import get_videos_link
-from pyUltroid._misc import owner_and_sudos, sudoers
-from pyUltroid._misc._assistant import in_pattern
-from pyUltroid._misc._wrappers import eod, eor
+from pyUltroid._misc import owner_and_sudos
 from pyUltroid.version import __version__ as UltVer
 from telethon import events
-from telethon.tl import functions, types
-from telethon.utils import get_display_name
+from telethon.tl import functions
 
 try:
     from yt_dlp import YoutubeDL
@@ -59,8 +51,6 @@ try:
    from youtubesearchpython import VideosSearch
 except ImportError:
     VideosSearch = None
-
-from strings import get_string
 
 asstUserName = asst.me.username
 LOG_CHANNEL = udB.get_key("LOG_CHANNEL")
