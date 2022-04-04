@@ -39,7 +39,7 @@ INLINE_PIC = udB.get_key("INLINE_PIC")
 
 if INLINE_PIC is None:
     INLINE_PIC = choice(ULTROID_IMAGES)
-elif INLINE_PIC == False:
+elif INLINE_PIC is False:
     INLINE_PIC = None
 
 Telegraph = telegraph_client()
