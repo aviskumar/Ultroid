@@ -285,7 +285,7 @@ async def parse_buttons(event):
         except Exception as er:
             LOGS.exception(er)
             buttons.append([Button.url(who_n, f"t.me/{x.username}")])
-    elif getattr(x, "username"):
+    elif x.username:
         buttons.append([Button.url(who_n, f"t.me/{x.username}")])
     else:
         buttons.append([Button.url(who_n, where_l)])
