@@ -66,7 +66,7 @@ def get_string(key: str) -> Any:
             en_ = languages["en"][key]
             if not Trs:
                 return en_
-            tr = Trs.translate(en_, lang_tgt=lang).replace("\ N", "\n")
+            tr = Trs.translate(en_, lang_tgt=lang).replace(r"\ N", r"\n")
             if en_.count("{}") != tr.count("{}"):
                 tr = en_
             if languages.get(lang):
