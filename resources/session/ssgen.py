@@ -7,6 +7,7 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 import os
+import sys
 from time import sleep
 
 ULTROID = r"""
@@ -44,7 +45,7 @@ def get_api_id_and_hash():
         API_ID = int(input("Please enter your API ID: "))
     except ValueError:
         print("APP ID must be an integer.\nQuitting...")
-        exit(0)
+        sys.exit(0)
     API_HASH = input("Please enter your API HASH: ")
     return API_ID, API_HASH
 
@@ -96,13 +97,13 @@ def telethon_session():
         print(
             "Your API ID/API HASH combination is invalid. Kindly recheck.\nQuitting..."
         )
-        exit(0)
+        sys.exit(0)
     except ValueError:
         print("API HASH must not be empty!\nQuitting...")
-        exit(0)
+        sys.exit(0)
     except PhoneNumberInvalidError:
         print("The phone number is invalid!\nQuitting...")
-        exit(0)
+        sys.exit(0)
     except Exception as er:
         print("Unexpected Error Occurred while Creating Session")
         print(er)
@@ -117,7 +118,7 @@ def main():
     if x.lower() in ["y", "yes"]:
         main()
     else:
-        exit(0)
+        sys.exit(0)
 
 
 main()
