@@ -10,13 +10,13 @@ from . import get_help
 __doc__ = get_help("help_beautify")
 
 
+import os
 import random
 
 from telethon.utils import get_display_name
 
 from . import Carbon, ultroid_cmd
 
-"""
 _colorspath = "resources/colorlist.txt"
 
 if os.path.exists(_colorspath):
@@ -88,8 +88,6 @@ async def crbn(event):
         f"Carbonised by {inline_mention(event.sender)}",
         file=xx,
     )
-
-"""
 
 
 RaySoTheme = [
