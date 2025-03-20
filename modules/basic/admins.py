@@ -61,6 +61,9 @@ async def prmte(ult):
                 delete_messages=True,
                 pin_messages=True,
                 manage_call=True,
+                post_stories=True,
+                edit_stories=True,
+                delete_stories=True,
                 title=rank,
             )
         await eod(
@@ -93,6 +96,9 @@ async def dmote(ult):
             delete_messages=None,
             pin_messages=None,
             manage_call=None,
+            post_stories=None,
+            edit_stories=None,
+            delete_stories=None,
             title=rank,
         )
         await eod(xx, get_string("de_2").format(inline_mention(user), ult.chat.title))
